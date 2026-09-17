@@ -155,7 +155,7 @@ export default function HeroSection() {
           <div className="lg:col-span-5 relative flex justify-center lg:justify-end">
             <div className="relative w-full max-w-md bg-white/90 backdrop-blur-xl border border-amber-100 p-4 rounded-3xl shadow-2xl transition-all duration-500 hover:shadow-amber-300">
               
-              <div className="w-full h-72 sm:h-80 bg-gradient-to-tr from-amber-100/60 to-orange-50 rounded-2xl overflow-hidden relative flex items-center justify-center p-2">
+              <div className="w-full h-72 sm:h-80 bg-gradient-to-tr from-amber-100/60 to-orange-50 rounded-2xl overflow-hidden relative flex items-center justify-center p-0">
                 
                 {slides.length > 0 ? (
                   slides.map((item, index) => (
