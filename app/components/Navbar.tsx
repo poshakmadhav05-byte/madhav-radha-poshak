@@ -2,6 +2,7 @@
 
 import { useCart } from '../context/CartContext';
 import { useState, useEffect } from 'react';
+import { API_URL } from '../api';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +18,7 @@ export default function Navbar() {
   useEffect(() => {
     async function fetchGlobalSettings() {
       try {
-        const res = await fetch('http://localhost:1337/api/global');
+        const res = await fetch(`${API_URL}/api/global`);
         const json = await res.json();
         if (json && json.data) {
           setGlobalData({

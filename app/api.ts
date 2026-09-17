@@ -1,0 +1,1 @@
+export const API_URL: string = "https://madhav-radha-poshak-backend.onrender.com";

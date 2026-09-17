@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { API_URL } from '../api';
 
 export default function FAQSection() {
   // FAQ Section Header ke liye state (CMS dynamic)
@@ -14,7 +15,7 @@ export default function FAQSection() {
   useEffect(() => {
     async function fetchFAQHeader() {
       try {
-        const res = await fetch('http://localhost:1337/api/faq-section');
+        const res = await fetch(`${API_URL}/api/faq-section`);
         const json = await res.json();
         if (json && json.data) {
           setSectionHeader({

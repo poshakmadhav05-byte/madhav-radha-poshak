@@ -1,6 +1,7 @@
 'use client';
 import { useCart } from '../context/CartContext';
 import { useState, useEffect } from 'react';
+import { API_URL } from '../api';
 
 export default function Products() {
   const { addToCart } = useCart();
@@ -35,7 +36,7 @@ export default function Products() {
     async function fetchData() {
       try {
         // 1. Fetch Product Section Header (Single Type)
-        const headerRes = await fetch('http://localhost:1337/api/product-section');
+        const headerRes = await fetch(`${API_URL}/api/product-section`);
         const headerJson = await headerRes.json();
         if (headerJson && headerJson.data) {
           setSectionHeader({
@@ -46,13 +47,13 @@ export default function Products() {
         }
 
         // 2. Fetch Products List (Collection Type)
-        const res = await fetch('http://localhost:1337/api/products?populate=*');
+       const res = await fetch(`${API_URL}/api/products?populate=*`);
         const data = await res.json();
         
         const formattedProducts = data.data.map((item: any) => {
           const imageUrl = item.image?.url 
-            ? `http://localhost:1337${item.image.url}` 
-            : '/images/gallery/1.jpg';
+    ? `${API_URL}${item.image.url}` 
+    : '/images/gallery/1.jpg';
 
           const stockStatus = item.inStock || 'In Stock';
           // Check if stock is out of stock (case-insensitive check)

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { API_URL } from '../api';
 
 export default function HeroSection() {
   // CMS se aane wale text ke liye default fallback state
@@ -23,7 +24,7 @@ export default function HeroSection() {
     async function fetchHeroData() {
       try {
         // 1. Hero Text fetch karna (Single Type)
-        const heroRes = await fetch('http://localhost:1337/api/hero');
+        const heroRes = await fetch(`${API_URL}/api/hero`);
         const heroJson = await heroRes.json();
         
         if (heroJson && heroJson.data) {
@@ -40,14 +41,14 @@ export default function HeroSection() {
         }
 
         // 2. Hero Slides fetch karna (Collection Type)
-        const slidesRes = await fetch('http://localhost:1337/api/hero-slides?populate=*');
+        const slidesRes = await fetch(`${API_URL}/api/hero-slides?populate=*`);
         const slidesJson = await slidesRes.json();
         
         if (slidesJson && slidesJson.data && slidesJson.data.length > 0) {
           const formattedSlides = slidesJson.data.map((item: any) => {
-            const imageUrl = item.image?.url 
-              ? `http://localhost:1337${item.image.url}` 
-              : '/images/hero_section_img2.jpg';
+           const imageUrl = item.image?.url 
+    ? `${API_URL}${item.image.url}` 
+    : '/images/hero_section_img2.jpg';
 
             return {
               id: item.id,

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { API_URL } from '../api';
 
 export default function Features() {
   // CMS se data aane tak default fallback values
@@ -40,7 +41,7 @@ export default function Features() {
   useEffect(() => {
     async function fetchFeatureData() {
       try {
-        const res = await fetch('http://localhost:1337/api/feature-section');
+        const res = await fetch(`${API_URL}/api/feature-section`);
         const json = await res.json();
 
         if (json && json.data) {

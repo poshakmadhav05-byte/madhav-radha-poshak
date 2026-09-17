@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { API_URL } from '../api';
 
 export default function Reviews() {
   // Review Section Header ke liye state (CMS dynamic)
@@ -14,7 +15,7 @@ export default function Reviews() {
   useEffect(() => {
     async function fetchReviewHeader() {
       try {
-        const res = await fetch('http://localhost:1337/api/review-section');
+        const res = await fetch(`${API_URL}/api/review-section`);
         const json = await res.json();
         if (json && json.data) {
           setSectionHeader({
