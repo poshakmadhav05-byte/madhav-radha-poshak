@@ -1,8 +1,10 @@
 'use client';
 
+import React from 'react';
+
 export default function FooterSection() {
 
-  const scrollToSection = (e, footerSection) => {
+  const scrollToSection = (e: React.SyntheticEvent, footerSection: string) => {
     e.preventDefault(); // URL mein # aane se rokta hai
     const element = document.getElementById(footerSection);
     if (element) {
@@ -33,7 +35,7 @@ export default function FooterSection() {
             </div>
           </div>
 
-          {/* Column 2: Quick Links (Added onClick handlers here) */}
+          {/* Column 2: Quick Links */}
           <div>
             <h4 className="text-base font-bold font-serif text-white uppercase tracking-wider mb-5">
               Quick Links
@@ -101,7 +103,7 @@ export default function FooterSection() {
               Naye sacred collections aur festive offers ki update sabse pehle paane ke liye judein.
             </p>
             
-            <form onSubmit={(e) => { e.preventDefault(); alert('Subscribed successfully! 🙏'); }} className="flex flex-col gap-2">
+            <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); alert('Subscribed successfully! 🙏'); }} className="flex flex-col gap-2">
               <input
                 type="email"
                 required
