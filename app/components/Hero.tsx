@@ -7,7 +7,7 @@ export default function HeroSection() {
   // CMS se aane wale text ke liye default fallback state
   const [heroContent, setHeroContent] = useState({
     tagline: 'Handcrafted in Aligarh with Pure Devotion',
-    heading: 'Madhav Radha Divine Vastra & Shringar for Your Beloved Deity',
+    heading: 'Madhav Radha Divine Vastra & Aligarh for Your Beloved Deity',
     subheading: 'Adorn your deities with exquisitely handcrafted poshak, heavy zardozi work, and pure fabrics straight from the traditional artisans of Aligarh.',
     primaryButtonText: 'Explore Collection',
     secondaryButtonText: 'Our Heritage Craft',
