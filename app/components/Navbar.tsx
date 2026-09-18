@@ -24,7 +24,7 @@ export default function Navbar() {
           setGlobalData({
             siteName: json.data.siteName || 'Madhav',
             siteNameHighlight: json.data.siteNameHighlight || 'Radha',
-            cartButtonText: json.data.cartButtonText || 'Seva Cart',
+            cartButtonText: json.data.cartButtonText || 'Add to Cart',
           });
         }
       } catch (error) {

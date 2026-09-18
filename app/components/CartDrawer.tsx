@@ -18,7 +18,7 @@ export default function CartDrawer() {
     
     message += `*Total Amount: ₹${totalPrice}*\n\nPlease confirm availability, payment options, and shipping details.`;
 
-    const phoneNumber = "8791711275"; 
+    const phoneNumber = "9058566626"; 
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
   };

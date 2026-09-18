@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Product type definition for TypeScript
 export interface Product {
@@ -30,8 +30,23 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  // 1. Initial state mein localStorage se data load karein (agar browser par hain)
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedCart = localStorage.getItem('madhav_cart');
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    return [];
+  });
+
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // 2. Jab bhi cart change ho, use localStorage mein save kar dein
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('madhav_cart', JSON.stringify(cart));
+    }
+  }, [cart]);
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
