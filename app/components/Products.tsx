@@ -9,6 +9,9 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [activePopupIndex, setActivePopupIndex] = useState<number | null>(null);
 
+  // Pagination state: Initial limit 9 products
+  const [visibleCount, setVisibleCount] = useState(9);
+
   // Selected size state for the current popup product
   const [selectedSize, setSelectedSize] = useState('0 Number');
 
@@ -54,7 +57,6 @@ export default function Products() {
           let imageUrl = '/images/gallery/1.jpg';
           
           if (item.image?.url) {
-            // Cloudinary ya external link hone par direct URL use karein, warna API_URL lagayein
             imageUrl = item.image.url.startsWith('http') 
               ? item.image.url 
               : `${API_URL}${item.image.url}`;
@@ -128,6 +130,15 @@ export default function Products() {
     addToCart(productWithSize);
   };
 
+  // Handler for Load More button
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 6); // Click karne par 6 aur products load honge
+  };
+
+  // Currently visible products slice
+  const visibleProducts = products.slice(0, visibleCount);
+  const hasMoreProducts = visibleCount < products.length;
+
   return (
     <section id="product" className="py-24 bg-gradient-to-b from-amber-50/80 via-stone-50 to-amber-50/50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -151,70 +162,87 @@ export default function Products() {
             Loading Divine Poshaks from Strapi CMS... ✨
           </div>
         ) : (
-          /* Products Grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product, index) => (
-              <div 
-                key={product.id || index} 
-                onClick={() => setActivePopupIndex(index)}
-                className="bg-white rounded-3xl border border-amber-200/60 overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-102 flex flex-col justify-between group animate-fade-in-scale cursor-pointer"
-              >
-                <div className="relative w-full h-72 bg-gradient-to-tr from-amber-100/50 to-orange-50 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 drop-shadow-lg"
-                    onError={(e) => {
-                      e.currentTarget.src = "https://via.placeholder.com/300?text=Divine+Poshak";
-                    }}
-                  />
-                  {/* Dynamic Stock Badge from CMS */}
-                  <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${
-                    product.isOutOfStock ? 'bg-red-700 text-white' : 'bg-amber-900/90 text-amber-100'
-                  }`}>
-                    {product.inStock}
-                  </div>
-                </div>
-
-                <div className="p-6 flex flex-col flex-grow justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 font-serif group-hover:text-amber-700 transition-colors duration-300">
-                      {product.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-2 line-clamp-2 leading-relaxed">
-                      {product.description}
-                    </p>
+          <>
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {visibleProducts.map((product, index) => (
+                <div 
+                  key={product.id || index} 
+                  onClick={() => setActivePopupIndex(index)}
+                  className="bg-white rounded-3xl border border-amber-200/60 overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-102 flex flex-col justify-between group animate-fade-in-scale cursor-pointer"
+                >
+                  <div className="relative w-full h-72 bg-gradient-to-tr from-amber-100/50 to-orange-50 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 drop-shadow-lg"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/300?text=Divine+Poshak";
+                      }}
+                    />
+                    {/* Dynamic Stock Badge from CMS */}
+                    <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${
+                      product.isOutOfStock ? 'bg-red-700 text-white' : 'bg-amber-900/90 text-amber-100'
+                    }`}>
+                      {product.inStock}
+                    </div>
                   </div>
 
-                  <div className="mt-6 flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="p-6 flex flex-col flex-grow justify-between">
                     <div>
-                      <span className="text-xs text-gray-400 line-through font-medium">
-                        ₹{product.originalPrice}
-                      </span>
-                      <p className="text-xl font-extrabold text-amber-800">
-                        ₹{product.price}
+                      <h3 className="text-xl font-bold text-gray-900 font-serif group-hover:text-amber-700 transition-colors duration-300">
+                        {product.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+                        {product.description}
                       </p>
                     </div>
 
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActivePopupIndex(index);
-                      }}
-                      className={`rounded-xl px-5 py-2.5 text-white text-sm font-medium shadow-md transition-all duration-300 ${
-                        product.isOutOfStock 
-                          ? 'bg-gray-400 cursor-not-allowed opacity-75' 
-                          : 'bg-amber-700 hover:bg-amber-800 shadow-amber-200 transform active:scale-95 cursor-pointer'
-                      }`}
-                    >
-                      {product.isOutOfStock ? 'Out of Stock' : 'Buy Now'}
-                    </button>
-                  </div>
-                </div>
+                    <div className="mt-6 flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div>
+                        <span className="text-xs text-gray-400 line-through font-medium">
+                          ₹{product.originalPrice}
+                        </span>
+                        <p className="text-xl font-extrabold text-amber-800">
+                          ₹{product.price}
+                        </p>
+                      </div>
 
-              </div>
-            ))}
-          </div>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActivePopupIndex(index);
+                        }}
+                        className={`rounded-xl px-5 py-2.5 text-white text-sm font-medium shadow-md transition-all duration-300 ${
+                          product.isOutOfStock 
+                            ? 'bg-gray-400 cursor-not-allowed opacity-75' 
+                            : 'bg-amber-700 hover:bg-amber-800 shadow-amber-200 transform active:scale-95 cursor-pointer'
+                        }`}
+                      >
+                        {product.isOutOfStock ? 'Out of Stock' : 'Buy Now'}
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              ))}
+            </div>
+
+            {/* Load More Button Section */}
+            <div className="mt-14 text-center">
+              <button
+                onClick={hasMoreProducts ? handleLoadMore : undefined}
+                disabled={!hasMoreProducts}
+                className={`px-8 py-3.5 rounded-xl font-semibold text-sm shadow-md transition-all duration-300 ${
+                  hasMoreProducts
+                    ? 'bg-amber-700 text-white hover:bg-amber-800 shadow-amber-200 cursor-pointer transform hover:-translate-y-0.5'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed opacity-80'
+                }`}
+              >
+                {hasMoreProducts ? 'Load More Products ✨' : 'No more products 🚫'}
+              </button>
+            </div>
+          </>
         )}
 
         {/* --- POPUP WITH SIZE DROPDOWN & SLIDER --- */}
