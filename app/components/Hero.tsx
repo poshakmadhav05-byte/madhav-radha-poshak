@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 
 export default function HeroSection() {
-  // CMS se aane wale text ke liye default fallback state
   const [heroContent, setHeroContent] = useState({
     tagline: 'Handcrafted in Aligarh with Pure Devotion',
     heading: 'Madhav Radha Divine Vastra & Aligarh for Your Beloved Deity',
@@ -19,11 +18,13 @@ export default function HeroSection() {
   const [slides, setSlides] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Strapi se Hero text aur Slides fetch karne ke liye useEffect
+  // Touch/Drag swipe ke liye coordinates track karne ka reference
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
   useEffect(() => {
     async function fetchHeroData() {
       try {
-        // 1. Hero Text fetch karna (Single Type)
         const heroRes = await fetch(`${API_URL}/api/hero`);
         const heroJson = await heroRes.json();
         
@@ -40,16 +41,13 @@ export default function HeroSection() {
           });
         }
 
-        // 2. Hero Slides fetch karna (Collection Type)
         const slidesRes = await fetch(`${API_URL}/api/hero-slides?populate=*`);
         const slidesJson = await slidesRes.json();
         
         if (slidesJson && slidesJson.data && slidesJson.data.length > 0) {
           const formattedSlides = slidesJson.data.map((item: any) => {
             let imageUrl = '/images/hero_section_img2.jpg';
-            
             if (item.image?.url) {
-              // Cloudinary ya external link hone par direct URL use karein, warna API_URL lagayein
               imageUrl = item.image.url.startsWith('http') 
                 ? item.image.url 
                 : `${API_URL}${item.image.url}`;
@@ -83,20 +81,53 @@ export default function HeroSection() {
     return () => clearInterval(timer);
   }, [slides.length]);
 
+  // Next & Prev slide handlers for arrows
+  const nextSlide = () => {
+    if (slides.length > 0) {
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
+    }
+  };
+
+  const prevSlide = () => {
+    if (slides.length > 0) {
+      setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+    }
+  };
+
+  // Touch swipe handlers (Mobile/Tablet swipe)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    
+    // Minimum swipe distance threshold (50px)
+    if (distance > 50) {
+      nextSlide(); // Swipe Left -> Next Slide
+    } else if (distance < -50) {
+      prevSlide(); // Swipe Right -> Prev Slide
+    }
+    
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  };
+
   const scrollToProduct = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const element = document.getElementById('product');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
   };
 
   const scrollToProductNew = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const elementNew = document.getElementById('features');
-    if (elementNew) {
-      elementNew.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (elementNew) elementNew.scrollIntoView({ behavior: 'smooth' });
   };
 
   const currentProduct = slides.length > 0 ? slides[currentIndex] : {
@@ -109,7 +140,6 @@ export default function HeroSection() {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50 py-20 lg:py-20">
-      {/* Background soft divine glow shapes with slow pulse */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
         <div className="absolute top-10 left-10 w-72 h-72 bg-amber-200/40 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-80 h-80 bg-orange-200/40 rounded-full blur-3xl animate-pulse"></div>
@@ -118,7 +148,7 @@ export default function HeroSection() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Column: Dynamic Text from Strapi */}
+          {/* Left Column: Dynamic Text */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left transition-all duration-1000 transform translate-y-0 opacity-100">
             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold tracking-wide uppercase shadow-xs">
               ✨ {heroContent.tagline}
@@ -156,19 +186,43 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Dynamic Image Slider from Strapi */}
+          {/* Right Column: Dynamic Image Slider with Arrows & Touch Swipe */}
           <div className="lg:col-span-5 relative flex justify-center lg:justify-end">
             <div className="relative w-full max-w-md bg-white/90 backdrop-blur-xl border border-amber-100 p-4 rounded-3xl shadow-2xl transition-all duration-500 hover:shadow-amber-300">
               
-              <div className="w-full h-72 sm:h-80 bg-gradient-to-tr from-amber-100/60 to-orange-50 rounded-2xl overflow-hidden relative flex items-center justify-center p-0">
+              {/* Image Container with Touch Support */}
+              <div 
+                className="w-full h-72 sm:h-80 bg-gradient-to-tr from-amber-100/60 to-orange-50 rounded-2xl overflow-hidden relative flex items-center justify-center cursor-grab active:cursor-grabbing"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 
+                {/* Left Arrow Button */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-amber-900/70 text-white flex items-center justify-center font-bold hover:bg-amber-900 transition shadow-md cursor-pointer"
+                  aria-label="Previous Slide"
+                >
+                  ‹
+                </button>
+
+                {/* Right Arrow Button */}
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-amber-900/70 text-white flex items-center justify-center font-bold hover:bg-amber-900 transition shadow-md cursor-pointer"
+                  aria-label="Next Slide"
+                >
+                  ›
+                </button>
+
                 {slides.length > 0 ? (
                   slides.map((item, index) => (
                     <img
                       key={item.id}
                       src={item.image}
                       alt={item.title}
-                      className={`absolute w-full h-full object-cover drop-shadow-xl transition-all duration-1000 ease-in-out transform ${
+                      className={`absolute w-full h-full object-cover drop-shadow-xl transition-all duration-1000 ease-in-out transform pointer-events-none ${
                         index === currentIndex 
                           ? 'opacity-100 scale-100 animate-slow-zoom' 
                           : 'opacity-0 scale-95 pointer-events-none'
