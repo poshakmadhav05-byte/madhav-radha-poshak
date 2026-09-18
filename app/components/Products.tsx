@@ -47,16 +47,20 @@ export default function Products() {
         }
 
         // 2. Fetch Products List (Collection Type)
-       const res = await fetch(`${API_URL}/api/products?populate=*`);
+        const res = await fetch(`${API_URL}/api/products?populate=*`);
         const data = await res.json();
         
         const formattedProducts = data.data.map((item: any) => {
-          const imageUrl = item.image?.url 
-    ? `${API_URL}${item.image.url}` 
-    : '/images/gallery/1.jpg';
+          let imageUrl = '/images/gallery/1.jpg';
+          
+          if (item.image?.url) {
+            // Cloudinary ya external link hone par direct URL use karein, warna API_URL lagayein
+            imageUrl = item.image.url.startsWith('http') 
+              ? item.image.url 
+              : `${API_URL}${item.image.url}`;
+          }
 
           const stockStatus = item.inStock || 'In Stock';
-          // Check if stock is out of stock (case-insensitive check)
           const isOutOfStock = stockStatus.toLowerCase().includes('out of stock');
 
           return {
@@ -87,7 +91,7 @@ export default function Products() {
   useEffect(() => {
     if (activePopupIndex !== null) {
       document.body.style.overflow = 'hidden';
-      setSelectedSize('Size No. 0'); // Reset default size when popup opens
+      setSelectedSize('Size No. 0');
     } else {
       document.body.style.overflow = 'auto';
     }
@@ -114,7 +118,7 @@ export default function Products() {
 
   // Handle adding to cart with selected size
   const handleAddToCartWithMetadata = (product: any) => {
-    if (product.isOutOfStock) return; // Prevent adding if out of stock
+    if (product.isOutOfStock) return;
     const productWithSize = {
       ...product,
       cartId: `${product.id}-${selectedSize}`, 

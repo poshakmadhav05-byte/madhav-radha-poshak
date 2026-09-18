@@ -46,9 +46,14 @@ export default function HeroSection() {
         
         if (slidesJson && slidesJson.data && slidesJson.data.length > 0) {
           const formattedSlides = slidesJson.data.map((item: any) => {
-           const imageUrl = item.image?.url 
-    ? `${API_URL}${item.image.url}` 
-    : '/images/hero_section_img2.jpg';
+            let imageUrl = '/images/hero_section_img2.jpg';
+            
+            if (item.image?.url) {
+              // Cloudinary ya external link hone par direct URL use karein, warna API_URL lagayein
+              imageUrl = item.image.url.startsWith('http') 
+                ? item.image.url 
+                : `${API_URL}${item.image.url}`;
+            }
 
             return {
               id: item.id,
