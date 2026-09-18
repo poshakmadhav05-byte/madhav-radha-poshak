@@ -12,7 +12,7 @@ export default function Navbar() {
   const [globalData, setGlobalData] = useState({
     siteName: 'Madhav',
     siteNameHighlight: 'Radha',
-    cartButtonText: 'Seva Cart',
+    cartButtonText: 'Add to Cart',
   });
 
   useEffect(() => {
